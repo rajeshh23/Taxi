@@ -1,0 +1,18 @@
+[
+  {
+    "Market_Id": "NY",
+    "Market_Name": "NY Media Management",
+    "Market_Url": "https://localhost:44382/"
+  },
+  {
+    "Market_Id": "TAXITOP",
+    "Market_Name": "TAXITOP Media Management",
+    "Market_Url": " https://localhost:44352/"
+  },
+  {
+    "Market_Id": "M10",
+    "Market_Name": "M10 Media Management",
+    "Market_Url": " https://localhost:44352/"
+  }
+
+]
