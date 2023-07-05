@@ -6053,10 +6053,41 @@ export default class TableGrid extends Component {
                       }}
                     ></input>
                   </div>
-                  <div className="leftDiv-md2"></div>
-                  <div className="RightDiv-md2"></div>
+                  <div className="leftDiv-md2">
+                  <span className="SchedBnrPopTxt" style={{ marginLeft: "8%" }}>
+                    Provider
+                  </span>
+                </div>
+                <div
+                  className={
+                    this.state.typeL == 0
+                      ? "RightDiv-md2"
+                      : "RightDiv-md2 disableDiv"
+                  }
+                >
+                  <select
+                    style={{ width: "85%" }}
+                    className=""
+                    onChange={(e) =>{
+                      this.state.flEditData.Provider = e.target.value;
+                      this.setState({ provider: e.target.value })
+                    }}
+                    value={this.state.flEditData.Provider}
+                  >
+                    <option value={""}></option>
+
+                    {this.state.providerData.map((key, index) => {
+                      return (
+                        <option value={key.Provider_ID}>
+                          {key.Provider_Name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
                 </div>
               )}
+              
               {this.state.editGrFile && (
                 <div className="SchedBnrInptWrp">
                   <div className="leftDiv-md2">
