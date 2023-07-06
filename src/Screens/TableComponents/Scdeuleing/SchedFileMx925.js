@@ -8261,9 +8261,7 @@ export default class TableGrid extends Component {
                             this.state.providerData.length > 0
                           ) {
                             this.state.providerData.forEach(function (item) {
-                              if (
-                                rowInfo.original.Provider == item.Provider_Name
-                              ) {
+                              if (rowInfo.original.Provider == item.Provider_Name || rowInfo.original.Provider == item.Provider_ID) {
                                 provider = item.Provider_ID;
                               }
                             });
