@@ -116,7 +116,7 @@ const flType = ["Video", "Banner"];
 const grpStatus = ["Current", "Test", "Draft", "Test"];
 const tabsUrl = ["GroupAds_Flash_Video/GetAllVideosForGroup/", "GroupAds_Flash_Banner_Group/GetAllBannersForGroup/"];
 const dataChannel = ["ALL", "NBC", "NYCM"];
-const loopType = ["AdLoop", "", "WelcomeLoop", "GoodByLoop", "Payment Loop","PairNPay Loop"];
+const loopType = ["AdLoop", "", "WelcomeLoop", "GoodByLoop", "Payment Loop","","PairNPay Loop"];
 const FScreen = ["false", "true"]
 const userID = sessionStorage.getItem("userID");
 //let userList = sessionStorage.getItem("userList");
@@ -5655,7 +5655,7 @@ export default class TableGrid extends Component {
                                                             <option value={2}>Welcome Loop</option>
                                                             <option value={3}>Goodbye Loop</option>
                                                             <option value={4}>Payment Loop</option>
-                                                            <option value={5}>PairNPay Loop</option>
+                                                            <option value={6}>PairNPay Loop</option>
                                                             
                                                         </select>
                                                     </div>
@@ -6195,7 +6195,7 @@ export default class TableGrid extends Component {
                                                         <option value={2}>Welcome Loop</option>
                                                         <option value={3}>Goodbye Loop</option>
                                                         <option value={4}>Payment Loop</option>
-                                                        <option value={5}>PairNPay Loop</option>
+                                                        <option value={6}>PairNPay Loop</option>
                                                     </select>
                                                 </div>
                                                 :
