@@ -118,7 +118,7 @@ const flType=["Video","Banner"];
 const grpStatus=["Current","Test","Draft","Test"];
 const tabsUrl=["GroupAds_Flash_Video/GetAllVideosForGroup/","GroupAds_Flash_Banner_Group/GetAllBannersForGroup/"];
 const dataChannel=["ALL","NBC","NYCM"];
-const loopType=["AdLoop","","WelcomeLoop","GoodByLoop","Payment Loop"];
+const loopType=["AdLoop","","WelcomeLoop","GoodByLoop","Payment Loop","PairNPay Loop"];
 const FScreen=["false","true"]
 const userID =  sessionStorage.getItem("userID");
 let userList =  sessionStorage.getItem("userList");
@@ -4230,7 +4230,7 @@ seteditchannet(channel){
                               </div>
                               <div className="SchedBnrInptWrp">
                                   <div className="leftDiv-md2">
-                                      <span className="SchedBnrPopTxt">Type Loop *</span>
+                                      <span className="SchedBnrPopTxt">Loop Type*</span>
                                   </div>
                                   <div className="RightDiv-md2">
                                       <select style={{width:"94%"}} className="" onChange={(e)=>{
@@ -4250,6 +4250,7 @@ seteditchannet(channel){
                                           <option value={2}>Welcome Loop</option>
                                           <option value={3}>Goodbye Loop</option>
                                           <option value={4}>Payment Loop</option>
+                                          <option value={5}>PairNPay Loop</option>
                                       </select>
                                   </div>
                                   <div className="leftDiv-md2">
@@ -4533,7 +4534,6 @@ seteditchannet(channel){
                                           <span className="SchedBnrPopImgTypetxt1">{this.state.flEditData.HBannerName?this.state.flEditData.HBannerName:"No Image"}</span>
                                        </div>
                                     }
-
                                 </div>
 
                               </div>
@@ -4541,7 +4541,7 @@ seteditchannet(channel){
                                   this.state.flEditData.FileType==0 &&
                                   <div className="SchedBnrInptWrp">
                                       <div className="leftDiv-md2">
-                                          <span className="SchedBnrPopTxt">Type Loop *</span>
+                                          <span className="SchedBnrPopTxt">Loop Type*</span>
                                       </div>
                                       <div className="RightDiv-md2">
                                           <select className="SchedDropDwn1" onChange={(e)=>{
@@ -4563,6 +4563,7 @@ seteditchannet(channel){
                                               <option value={2}>Welcome Loop</option>
                                               <option value={3}>Goodbye Loop</option>
                                               <option value={4}>Payment Loop</option>
+                                              <option value={5}>PairNPay Loop</option>
                                           </select>
                                       </div>
                                       <div className="leftDiv-md2">
