@@ -663,6 +663,17 @@ export default class StatusImages extends Component {
     this.setState({ refresh: true });
   };
 
+  resetColmn(e, stateval) {
+    if (e === "close" && this.temp && this.temp.length) {
+      const newData = this.temp.map((key, index) => {
+        let temp1 = Object.assign({}, key);
+        return temp1;
+      });
+      this.state[stateval] = newData;
+    }
+    this.setState({ columnSt: false });
+  }
+  
   getRecord() {
     console.log("call get record ");
     this.setState({ data: [], loading: true });
@@ -691,15 +702,14 @@ export default class StatusImages extends Component {
   }
   setGroupInf(rowInfo) {
     if (rowInfo) {
+      this.addobj['FILEID'] = rowInfo.original["File_id"]
+
       this.setState(
         {
-          userName: rowInfo.original["UserID"],
-          email: rowInfo.original["EmailId"],
-          fName: rowInfo.original["FirstName"],
-          lName: rowInfo.original["LastName"],
-          grpName: rowInfo.original["UserGroup"],
-          status: rowInfo.original["StatusID"].toString(),
+          clientType: rowInfo.original["Client_code"],
+          imageType: rowInfo.original["Image_Type"],
           rowInfo: rowInfo.original,
+          dlgEnable : true
         },
         () => {
           console.log(this.state);
