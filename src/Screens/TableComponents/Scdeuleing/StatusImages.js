@@ -15,7 +15,7 @@ import moment from "moment";
 const ColumnCol = [
   { accessor: "Image_Type", lable: "Image Type" },
   { accessor: "Client_code", lable: "Client Code" },
-  { accessor: "File_id", lable: "File Name" },
+  { accessor: "FileName", lable: "File Name" },
 ];
 const flType = ["", "thank you", "shutoff"];
 let userList = sessionStorage.getItem("userList");
@@ -332,11 +332,29 @@ export default class StatusImages extends Component {
     this.setState({ columns: dColumn }, () => {
       this.getRecord();
       this.getAvailbleMediafiles();
+      this.fetchClientCode();
     });
   }
 
   componentWillUnmount() {
     document.removeEventListener("mousedown", this.handleClickOutside);
+  }
+
+  fetchClientCode() {
+    getData("ClientCode/FetchClientCodes").then((res) => {
+      if (res.data && res.data.ReturnCode === 0) {
+        console.log(" client code data", res.data);
+        // if (
+        //   res.data.ResponseCollection &&
+        //   res.data.ResponseCollection.length > 0
+        // ) {
+        //   this.state.ClientCodeData = res.data.ResponseCollection;
+        //   //  this.setState({ ClientCodeData: res.data.ResponseCollection })
+        //   // console.log("abhi ", ClientCodeData );
+        //   this.state.ClientID = this.state.ClientCodeData[0].ID;
+        // }
+      }
+    });
   }
 
   handleClickOutside(event) {
@@ -703,13 +721,15 @@ export default class StatusImages extends Component {
   setGroupInf(rowInfo) {
     if (rowInfo) {
       this.addobj['FILEID'] = rowInfo.original["File_id"]
-
+      this.addobj.WebVisibleURL = rowInfo.original['WebVisibleURL'];
+      this.addobj.FileName = rowInfo.original["FileName"]
+      this.addobj.VBannerName = rowInfo.original["FileName"]
       this.setState(
         {
           clientType: rowInfo.original["Client_code"],
           imageType: rowInfo.original["Image_Type"],
           rowInfo: rowInfo.original,
-          dlgEnable : true
+          dlgEnable : true,
         },
         () => {
           console.log(this.state);

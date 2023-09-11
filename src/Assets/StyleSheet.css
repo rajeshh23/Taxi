@@ -2021,7 +2021,7 @@ color: #333;
 }
 
 .tooltip1 {
-    position: relative;
+    position: absolute;
     display: inline-block;
     border-bottom: 1px dotted black;
 
@@ -2053,7 +2053,7 @@ color: #333;
    left:120px;
 }
 .screenSection_2{
-    top:-350px;
+    top:-180px;
        left:120px;
 }
 .screenSection_3{
@@ -2071,7 +2071,7 @@ color: #333;
     left:120px;
 }
 .screenSection_2{
-    top:-350px;
+    top:-180px;
     left:120px;
 }
 .screenSection_3{
