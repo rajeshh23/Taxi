@@ -51,6 +51,7 @@ export default class StatusImages extends Component {
       delete: [],
       rowInfo: [],
       userList: [],
+      ID:'1',
       imageType: "",
       clientType: "",
       schedVal: false,
@@ -720,6 +721,7 @@ export default class StatusImages extends Component {
           clientType: rowInfo.original["Client_code"],
           imageType: rowInfo.original["Image_Type"],
           rowInfo: rowInfo.original,
+          ID:rowInfo.original["ID"],
           dlgEnable : true,
           isEdit:true
         },
@@ -740,7 +742,7 @@ export default class StatusImages extends Component {
       let obj = {
         pImgData: [
           {
-            ID: this.state.isEdit ? "1":"0",
+            ID: this.state.ID,
             File_id: this.addobj.FILEID,
             Client_code: this.state.clientType,
             Image_Type: this.state.imageType,
@@ -1061,7 +1063,7 @@ export default class StatusImages extends Component {
                   <select
                     className="SchedDropDwn1"
                     onChange={(e) =>
-                      this.setState({ imageType: e.target.value })
+                      this.setState({ imageType: parseInt(e.target.value) })
                     }
                     value={this.state.imageType}
                   >
