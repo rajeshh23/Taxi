@@ -44,8 +44,8 @@ export const mUrls=[
     {
         Market_Id: "M10",
         Market_Name: "M10 Media Management",
-        // Market_Url: "https://mediadev.taxitronic.org/M10_TAXI_API/"
-        Market_Url: "https://m10market.taxitronic.org/M10_TAXI_API/"
+        Market_Url: "https://mediadev.taxitronic.org/M10_TAXI_API/"
+        // Market_Url: "https://m10market.taxitronic.org/M10_TAXI_API/"
 
     },
     {
