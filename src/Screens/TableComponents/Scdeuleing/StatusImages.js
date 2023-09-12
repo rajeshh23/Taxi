@@ -8,9 +8,10 @@ import axios from "axios";
 import Pagination from "../../CommomComponents/Pagination";
 import ComCheck from "../../CommomComponents/ComCheck";
 import Dialog from "../../CommomComponents/Dialog";
-import { DatePicker } from "antd";
+import DatePicker from "react-datepicker";
 import { Line } from "rc-progress";
 import moment from "moment";
+import "react-datepicker/dist/react-datepicker.css";
 
 const ColumnCol = [
   { accessor: "Image_Type", lable: "Image Type" },
@@ -756,7 +757,14 @@ export default class StatusImages extends Component {
             dlgtitle: "Information",
             schedVal: true,
             dlgEnable: false,
+            clientType:'',
+            imageType:'',
           });
+          this.addobj = {
+            WebVisibleURL: "",
+            FileName: "",
+            VBannerName: "",
+          }
           this.getRecord();
         })
         .catch(() => {
