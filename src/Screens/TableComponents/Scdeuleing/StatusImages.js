@@ -39,16 +39,9 @@ export default class StatusImages extends Component {
       columnSt: false,
       filtered: [],
       filter: -1,
-      tabIndex: 0,
       loading: true,
-      filterc: false,
       filterVal: [],
       visibleFilters: [],
-      userName: "",
-      email: "",
-      fName: "",
-      lName: "",
-      grpName: "MANAGER",
       status: "0",
       message: "",
       dlgtitle: "",
@@ -60,17 +53,16 @@ export default class StatusImages extends Component {
       imageType: "",
       clientType: "",
       schedVal: false,
-      dlgtitle: "",
-      message: "",
       fileUplaodLoding: false,
       loadFile: false,
       uploadby: -1,
       tags: "",
       searchbyFile: "",
       loadFileData: [],
-      clientData: ["cc1", "cc2"],
+      ClientCodeData: [],
       uplddata: [],
       upload:false,
+      isEdit:false
     };
   }
 
@@ -341,18 +333,16 @@ export default class StatusImages extends Component {
   }
 
   fetchClientCode() {
-    getData("ClientCode/FetchClientCodes").then((res) => {
+    getData("GroupADSFL/GetImgClientCodes").then((res) => {
       if (res.data && res.data.ReturnCode === 0) {
         console.log(" client code data", res.data);
-        // if (
-        //   res.data.ResponseCollection &&
-        //   res.data.ResponseCollection.length > 0
-        // ) {
-        //   this.state.ClientCodeData = res.data.ResponseCollection;
-        //   //  this.setState({ ClientCodeData: res.data.ResponseCollection })
-        //   // console.log("abhi ", ClientCodeData );
-        //   this.state.ClientID = this.state.ClientCodeData[0].ID;
-        // }
+        if (
+          res.data.ResponseCollection &&
+          res.data.ResponseCollection.length > 0
+        ) {
+          this.state.ClientCodeData = res.data.ResponseCollection;
+          this.state.ClientID = this.state.ClientCodeData[0].ClientCode;
+        }
       }
     });
   }
@@ -730,6 +720,7 @@ export default class StatusImages extends Component {
           imageType: rowInfo.original["Image_Type"],
           rowInfo: rowInfo.original,
           dlgEnable : true,
+          isEdit:true
         },
         () => {
           console.log(this.state);
@@ -748,13 +739,13 @@ export default class StatusImages extends Component {
       let obj = {
         pImgData: [
           {
-            ID: "1",
+            ID: this.state.isEdit ? "1":"0",
             File_id: this.addobj.FILEID,
             Client_code: this.state.clientType,
             Image_Type: this.state.imageType,
           },
         ],
-        operationCode: "0",
+        operationCode: this.state.isEdit ? "1":"0",
       };
       postData("GroupADSFL/ImgSet", obj)
         .then((resp) => {
@@ -1092,15 +1083,15 @@ export default class StatusImages extends Component {
                   <select
                     className="SchedDropDwn1"
                     onChange={(e) =>
-                      this.setState({ clientType: e.target.value })
+                      this.setState({ clientType: e.target.value})
                     }
                     value={this.state.clientType}
                   >
                     <option value={0}></option>
-                    {this.state.clientData.map((key, index) => {
+                    {this.state.ClientCodeData.map((key, index) => {
                       return (
-                        <option value={key} key={index}>
-                          {key}
+                        <option value={key.ClientCode} key={index}>
+                          {key.ClientName}
                         </option>
                       );
                     })}
