@@ -12,6 +12,7 @@ import DatePicker from "react-datepicker";
 import { Line } from "rc-progress";
 import moment from "moment";
 import "react-datepicker/dist/react-datepicker.css";
+import Select from "react-select";
 
 const ColumnCol = [
   { accessor: "Image_Type", lable: "Image Type" },
@@ -51,9 +52,9 @@ export default class StatusImages extends Component {
       delete: [],
       rowInfo: [],
       userList: [],
-      ID:'1',
+      ID: "1",
       imageType: "",
-      clientType: "",
+      clientType: null,
       schedVal: false,
       fileUplaodLoding: false,
       loadFile: false,
@@ -63,8 +64,11 @@ export default class StatusImages extends Component {
       loadFileData: [],
       ClientCodeData: [],
       uplddata: [],
-      upload:false,
-      isEdit:false
+      upload: false,
+      isEdit: false,
+      overwritePopup: false,
+      overwrite: false,
+      transformedData: [],
     };
   }
 
@@ -342,8 +346,11 @@ export default class StatusImages extends Component {
           res.data.ResponseCollection &&
           res.data.ResponseCollection.length > 0
         ) {
-          this.state.ClientCodeData = res.data.ResponseCollection;
-          this.state.ClientID = this.state.ClientCodeData[0].ClientCode;
+          let data = res.data.ResponseCollection.map((item) => ({
+            value: item.ClientCode,
+            label: item.ClientName,
+          }));
+          this.setState({ ClientCodeData: data });
         }
       }
     });
@@ -381,7 +388,7 @@ export default class StatusImages extends Component {
     date = new Date(date);
     return date;
   }
-  
+
   setUpldInput(val, rowInfo, type) {
     if (type === "ExpDate") {
       var temdata = [];
@@ -683,7 +690,7 @@ export default class StatusImages extends Component {
     }
     this.setState({ columnSt: false });
   }
-  
+
   getRecord() {
     console.log("call get record ");
     this.setState({ data: [], loading: true });
@@ -712,18 +719,18 @@ export default class StatusImages extends Component {
   }
   setGroupInf(rowInfo) {
     if (rowInfo) {
-      this.addobj['FILEID'] = rowInfo.original["File_id"]
-      this.addobj.WebVisibleURL = rowInfo.original['WebVisibleURL'];
-      this.addobj.FileName = rowInfo.original["FileName"]
-      this.addobj.VBannerName = rowInfo.original["FileName"]
+      this.addobj["FILEID"] = rowInfo.original["File_id"];
+      this.addobj.WebVisibleURL = rowInfo.original["WebVisibleURL"];
+      this.addobj.FileName = rowInfo.original["FileName"];
+      this.addobj.VBannerName = rowInfo.original["FileName"];
       this.setState(
         {
           clientType: rowInfo.original["Client_code"],
           imageType: rowInfo.original["Image_Type"],
           rowInfo: rowInfo.original,
-          ID:rowInfo.original["ID"],
-          dlgEnable : true,
-          isEdit:true
+          ID: rowInfo.original["ID"],
+          dlgEnable: true,
+          isEdit: true,
         },
         () => {
           console.log(this.state);
@@ -733,6 +740,8 @@ export default class StatusImages extends Component {
   }
   AddImageFile() {
     let msg = "";
+    this.setState({ overwritePopup: false });
+
     if (!this.addobj.WebVisibleURL) {
       msg = "Please add image file";
     } else if (!this.state.imageType) {
@@ -744,30 +753,42 @@ export default class StatusImages extends Component {
           {
             ID: this.state.ID,
             File_id: this.addobj.FILEID,
-            Client_code: this.state.clientType,
+            Client_code: this.state.clientType.value,
             Image_Type: this.state.imageType,
+            Image_overwrite: this.state.overwrite ? 1 : 0,
           },
         ],
-        operationCode: this.state.isEdit ? "1":"0",
+        operationCode: this.state.isEdit ? "1" : "0",
       };
       postData("GroupADSFL/ImgSet", obj)
         .then((resp) => {
-          console.log(resp);
-          msg = "Added Successfully";
-          this.setState({
-            message: msg,
-            dlgtitle: "Information",
-            schedVal: true,
-            dlgEnable: false,
-            clientType:'',
-            imageType:'',
-          });
-          this.addobj = {
-            WebVisibleURL: "",
-            FileName: "",
-            VBannerName: "",
+          if (resp.data.ReturnCode === 4) {
+            msg = "Do you want to Replace it?";
+            this.setState({
+              message: msg,
+              dlgtitle: "Information",
+              overwrite: false,
+              overwritePopup: true,
+            });
+          } else {
+            console.log(resp);
+            msg = "Added Successfully";
+            this.setState({
+              message: msg,
+              dlgtitle: "Information",
+              schedVal: true,
+              dlgEnable: false,
+              overwrite: false,
+              clientType: null,
+              imageType: "",
+            });
+            this.addobj = {
+              WebVisibleURL: "",
+              FileName: "",
+              VBannerName: "",
+            };
+            this.getRecord();
           }
-          this.getRecord();
         })
         .catch(() => {
           console.log("Error");
@@ -899,7 +920,7 @@ export default class StatusImages extends Component {
     this.addobj.VBannerName = "";
     this.addobj.FileName = "";
     this.state.imageType = "";
-    this.state.clientType = "";
+    this.state.clientType = null;
   }
   getAvailbleMediafiles() {
     let obj = {
@@ -992,7 +1013,17 @@ export default class StatusImages extends Component {
     this.setState({ fileUplaodLoding: false });
     this.setState({ uplddata: myData });
   }
+
+  setOverwrite() {
+    this.setState({ overwrite: true, isEdit: true },()=>this.AddImageFile());
+  }
+
+  onClientCodeChange = (clientType) => {
+    this.setState({ clientType });
+  }
   render() {
+    const { clientType } = this.state;
+
     return (
       <>
         {this.state.dlgEnable && (
@@ -1059,7 +1090,7 @@ export default class StatusImages extends Component {
                     Image Type *
                   </span>
                 </div>
-                <div className="RightDiv-md2">
+                <div className="RightDiv-md2" style={{ width: "70%" }}>
                   <select
                     className="SchedDropDwn1"
                     onChange={(e) =>
@@ -1089,23 +1120,21 @@ export default class StatusImages extends Component {
                     Client Code
                   </span>
                 </div>
-                <div className="RightDiv-md2">
-                  <select
-                    className="SchedDropDwn1"
-                    onChange={(e) =>
-                      this.setState({ clientType: e.target.value})
-                    }
-                    value={this.state.clientType}
-                  >
-                    <option value={0}></option>
+                <div className="RightDiv-md2" style={{ width: "70%" }}>
+                  <Select
+                    // className="SchedDropDwn1"
+                    onChange={this.onClientCodeChange}
+                    value={clientType}
+                    options={this.state.ClientCodeData}
+                  />
+                  {/* <option value={0}></option>
                     {this.state.ClientCodeData.map((key, index) => {
                       return (
                         <option value={key.ClientCode} key={index}>
                           {key.ClientName}
                         </option>
                       );
-                    })}
-                  </select>
+                    })} */}
                 </div>
               </div>
               <div className="SchedPopBtnWrp1">
@@ -1232,80 +1261,86 @@ export default class StatusImages extends Component {
                 </div>
               </div>
             )}
-            
-            
           </div>
         )}
         {this.state.schedVal && (
-              <Dialog
-                title={this.state.dlgtitle}
-                message={this.state.message}
-                onOk={() => this.setState({ schedVal: false })}
-                onHide={() => this.setState({ schedVal: false })}
-              />
-            )}
+          <Dialog
+            title={this.state.dlgtitle}
+            message={this.state.message}
+            onOk={() => this.setState({ schedVal: false })}
+            onHide={() => this.setState({ schedVal: false })}
+          />
+        )}
+        {this.state.overwritePopup && (
+          <Dialog
+            title={this.state.dlgtitle}
+            message={this.state.message}
+            type="confirmation"
+            onOk={() => this.setOverwrite()}
+            onCancel={() => this.setState({ overwritePopup: false })}
+            onHide={() => this.setState({ overwritePopup: false })}
+          />
+        )}
         {this.state.upload && (
-              <div className="Loader">
-                {this.state.fileUplaodLoding && (
-                  <div className="fileuploadLoading">
-                    <img
-                      src={require("../../../Assets/Images/kOnzy.gif")}
-                    ></img>
-                  </div>
-                )}
-
-                <div className="MediaUpldMainWrp">
-                  <div className="ForgPassTitle">File Upload</div>
-
-                  <input
-                    type="file"
-                    accept={this.uploadFileExt}
-                    style={{ display: "none" }}
-                    ref="fileUploader"
-                    onChange={(e) => {
-                      this.setState({ fileUplaodLoding: true });
-                      this.onFileChange(e);
-                    }}
-                    multiple
-                  ></input>
-                  <img
-                    src={require("../../../Assets/Images/Media/select-files.png")}
-                    className="MeadiaUpldSlFl"
-                    onClick={() => this.refs.fileUploader.click()}
-                  ></img>
-                  <ReactTable
-                    columns={this.upColumns}
-                    data={this.state.uplddata}
-                    showPagination={false}
-                    sortable={false}
-                    minRows={10}
-                    defaultPageSize={10}
-                    pageSize={this.state.uplddata.length}
-                    NoDataComponent={() => null}
-                  />
-                  <div className="MediaFlUpldBtm">
-                    <img
-                      src={require("../../../Assets/Images/Media/upload-btn-popup.png")}
-                      className="MediaFlupBtn"
-                      onClick={() => this.uploadMultiFiles()}
-                    ></img>
-                    <img
-                      src={require("../../../Assets/Images/Login/cancel-btn.png")}
-                      className="MediaFlupBtn"
-                      onClick={() =>
-                        this.setState({
-                          fileUplaodLoding: false,
-                          upload: false,
-                          uplddata: [],
-                          selectedFiles: [],
-                          upLoadvalidMsg: false,
-                        })
-                      }
-                    ></img>
-                  </div>
-                </div>
+          <div className="Loader">
+            {this.state.fileUplaodLoding && (
+              <div className="fileuploadLoading">
+                <img src={require("../../../Assets/Images/kOnzy.gif")}></img>
               </div>
             )}
+
+            <div className="MediaUpldMainWrp">
+              <div className="ForgPassTitle">File Upload</div>
+
+              <input
+                type="file"
+                accept={this.uploadFileExt}
+                style={{ display: "none" }}
+                ref="fileUploader"
+                onChange={(e) => {
+                  this.setState({ fileUplaodLoding: true });
+                  this.onFileChange(e);
+                }}
+                multiple
+              ></input>
+              <img
+                src={require("../../../Assets/Images/Media/select-files.png")}
+                className="MeadiaUpldSlFl"
+                onClick={() => this.refs.fileUploader.click()}
+              ></img>
+              <ReactTable
+                columns={this.upColumns}
+                data={this.state.uplddata}
+                showPagination={false}
+                sortable={false}
+                minRows={10}
+                defaultPageSize={10}
+                pageSize={this.state.uplddata.length}
+                NoDataComponent={() => null}
+              />
+              <div className="MediaFlUpldBtm">
+                <img
+                  src={require("../../../Assets/Images/Media/upload-btn-popup.png")}
+                  className="MediaFlupBtn"
+                  onClick={() => this.uploadMultiFiles()}
+                ></img>
+                <img
+                  src={require("../../../Assets/Images/Login/cancel-btn.png")}
+                  className="MediaFlupBtn"
+                  onClick={() =>
+                    this.setState({
+                      fileUplaodLoding: false,
+                      upload: false,
+                      uplddata: [],
+                      selectedFiles: [],
+                      upLoadvalidMsg: false,
+                    })
+                  }
+                ></img>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="TableBorder">
           {this.state.columnSt && (
             <ColumnStatus
@@ -1322,7 +1357,7 @@ export default class StatusImages extends Component {
               onClick={() => this.setState({ upload: true })}
             ></img>
             <img
-              src={require("../../../Assets/Images/Schedule/add-banner.png")}
+              src={require("../../../Assets/Images/Schedule/configure.png")}
               className="ScheduleupldImg"
               onClick={() => this.setState({ dlgEnable: true })}
             ></img>
