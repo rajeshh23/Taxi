@@ -338,8 +338,8 @@ export default class StatusImages extends Component {
     document.removeEventListener("mousedown", this.handleClickOutside);
   }
 
-  fetchClientCode() {
-    getData("GroupADSFL/GetImgClientCodes").then((res) => {
+  async fetchClientCode() {
+   await getData("GroupADSFL/GetImgClientCodes").then((res) => {
       if (res.data && res.data.ReturnCode === 0) {
         console.log(" client code data", res.data);
         if (
@@ -360,7 +360,7 @@ export default class StatusImages extends Component {
             return 0;
           });
 
-          this.setState({ ClientCodeData: data });
+          this.setState({ ClientCodeData: data,loading: false });
         }
       }
     });
@@ -723,7 +723,7 @@ export default class StatusImages extends Component {
           loading: false,
         });
       } else {
-        this.setState({ data: [], loading: false });
+        this.setState({ data: [] });
       }
     });
   }
@@ -733,11 +733,8 @@ export default class StatusImages extends Component {
       this.addobj.WebVisibleURL = rowInfo.original["WebVisibleURL"];
       this.addobj.FileName = rowInfo.original["FileName"];
       this.addobj.VBannerName = rowInfo.original["FileName"];
-      const Client_name = this.state.ClientCodeData.find((ele) => ele.value === rowInfo.original["Client_code"]);
-      let obj = {
-        label : rowInfo.original["Client_code"],
-        value : Client_name
-      }
+      const obj = this.state.ClientCodeData.find((ele) => ele.value === rowInfo.original["Client_code"]);
+      
       this.setState(
         {
           clientType: obj,
@@ -1134,7 +1131,7 @@ export default class StatusImages extends Component {
                     className="SchedBnrPopTxt"
                     style={{ paddingRight: "5px" }}
                   >
-                    Client Code
+                    Client Name
                   </span>
                 </div>
                 <div className="RightDiv-md2" style={{ width: "70%" }}>
