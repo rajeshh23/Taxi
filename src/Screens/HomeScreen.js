@@ -199,7 +199,7 @@ export default class HomeScreen extends Component {
                       list.push({ id: "Survey", key: Survey });
                     }
                   });
-                  list.push({ id: "Status Images", key: StatusImages });
+                  list.push({ id: "Static Image", key: StatusImages });
                   obj.List = list;
                   subMenulist.push(obj);
                 }

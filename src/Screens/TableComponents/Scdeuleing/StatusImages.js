@@ -19,7 +19,7 @@ const ColumnCol = [
   { accessor: "Client_code", lable: "Client Code" },
   { accessor: "FileName", lable: "File Name" },
 ];
-const flType = ["", "thank you", "shutoff"];
+const flType = ["", "Thank you screen", "Shutoff screen"];
 let userList = sessionStorage.getItem("userList");
 const userID = sessionStorage.getItem("userID");
 
@@ -350,6 +350,16 @@ export default class StatusImages extends Component {
             value: item.ClientCode,
             label: item.ClientName,
           }));
+
+          data.sort((a, b) => {
+            const labelA = a.label.toLowerCase();
+            const labelB = b.label.toLowerCase();
+          
+            if (labelA < labelB) return -1;
+            if (labelA > labelB) return 1;
+            return 0;
+          });
+
           this.setState({ ClientCodeData: data });
         }
       }
@@ -723,9 +733,14 @@ export default class StatusImages extends Component {
       this.addobj.WebVisibleURL = rowInfo.original["WebVisibleURL"];
       this.addobj.FileName = rowInfo.original["FileName"];
       this.addobj.VBannerName = rowInfo.original["FileName"];
+      const Client_name = this.state.ClientCodeData.find((ele) => ele.value === rowInfo.original["Client_code"]);
+      let obj = {
+        label : rowInfo.original["Client_code"],
+        value : Client_name
+      }
       this.setState(
         {
-          clientType: rowInfo.original["Client_code"],
+          clientType: obj,
           imageType: rowInfo.original["Image_Type"],
           rowInfo: rowInfo.original,
           ID: rowInfo.original["ID"],
@@ -779,6 +794,7 @@ export default class StatusImages extends Component {
               schedVal: true,
               dlgEnable: false,
               overwrite: false,
+              isEdit:false,
               clientType: null,
               imageType: "",
             });
@@ -910,7 +926,7 @@ export default class StatusImages extends Component {
     }
   }
   resetFlDetails() {
-    this.setState({ imageType: "", dlgEnable: false });
+    this.setState({ imageType: "", dlgEnable: false,clientType:'',isEdit:false });
     this.addobj = {
       VBannerName: "",
       FileName: "",
@@ -1021,6 +1037,7 @@ export default class StatusImages extends Component {
   onClientCodeChange = (clientType) => {
     this.setState({ clientType });
   }
+
   render() {
     const { clientType } = this.state;
 
