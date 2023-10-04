@@ -348,7 +348,7 @@ export default class StatusImages extends Component {
         ) {
           let data = res.data.ResponseCollection.map((item) => ({
             value: item.ClientCode,
-            label: item.ClientName,
+            label: item.ClientCode,
           }));
 
           data.sort((a, b) => {
@@ -1131,7 +1131,7 @@ export default class StatusImages extends Component {
                     className="SchedBnrPopTxt"
                     style={{ paddingRight: "5px" }}
                   >
-                    Client Name
+                    Client Code
                   </span>
                 </div>
                 <div className="RightDiv-md2" style={{ width: "70%" }}>
