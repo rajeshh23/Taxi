@@ -34,7 +34,7 @@ const testoptions = [
 let unitType = ["M10", "TREK"];
 const UnitMode = ["Lab/Demo", "Production"];
 const statusCnst = ["Active", "Inactive"];
-const subTabs = ["File Details", "Associated Cabs", "Reports"];
+const subTabs = ["File Details", "Associated Cabs"];
 const priorityCnt = ["", "Low", "Medium", "High"];
 const subTabsUrl = [
   "",
@@ -93,6 +93,7 @@ let subTabColumns = [
     { accessor: "PWL", lable: "PWL" },
     { accessor: "PWSSL", lable: "PWSSL" },
     { accessor: "PWSNF", lable: "PWSNF" },
+    { accessor: "ReportStatus", lable: "ReportStatus" },
   ],
   [
     { accessor: "unitkey", lable: "IMSI" },
@@ -153,6 +154,7 @@ let associateCabsCol = [
   { accessor: "PWL", lable: "PWL" },
   { accessor: "PWSSL", lable: "PWSSL" },
   { accessor: "PWSNF", lable: "PWSNF" },
+  { accessor: "ReportStatus", lable: "ReportStatus" },
 ];
 
 const grpData = [
@@ -186,6 +188,16 @@ export default class SystemFiles extends Component {
   myInterval;
   myTimer = null;
   listOption = [];
+  releaseActionOption =  [
+    {
+      value:"1",lable:"Active"
+    },
+    {
+      value:"0",lable:"Inactive"
+    },
+    {
+      value:"2",lable:"All"
+    }];
   ClientlistOption = [];
   SysFilelistOption = [];
   cabObj = {};
@@ -225,6 +237,23 @@ export default class SystemFiles extends Component {
         <div className="SystFlColContainer">
           <span className="number">{rowInfo.original.Name}</span>
           <div className="SystGrpRowImgWrp">
+          {rowInfo.original.Status === 1 ? (
+            
+              <img
+                src={
+                  require("../../../Assets/Images/System/active.PNG")
+                }
+                className="StatGrpFileImg1"
+              ></img>
+            
+          ) : (
+              <img
+                src={
+                  require("../../../Assets/Images/System/inActive.PNG")
+                }
+                className="StatGrpFileImg1"
+              ></img>
+          )}
             <img
               src={require("../../../Assets/Images/Group/file.png")}
               className="StatGrpFileImg1"
@@ -404,6 +433,7 @@ export default class SystemFiles extends Component {
           { accessor: "LastIndex", lable: "Unit Index" },
           { accessor: "IND", lable: "Latest Index" },
           { accessor: "CLIENTNAME", lable: "Client Name" },
+          { accessor: "ReportStatus", lable: "ReportStatus" },
         ];
         scheduleCol = [
           { accessor: "IPAddress", lable: "IP Address" },
@@ -442,6 +472,7 @@ export default class SystemFiles extends Component {
           { accessor: "LastIndex", lable: "Unit Index" },
           { accessor: "IND", lable: "Latest Index" },
           { accessor: "CLIENTNAME", lable: "Client Name" },
+          { accessor: "ReportStatus", lable: "ReportStatus" },
         ];
       } else if (sessionStorage.getItem("marketId") == "DTTU") {
         subTabColumns[1] = [
@@ -616,6 +647,12 @@ export default class SystemFiles extends Component {
       startIndex: 0,
       count: 0,
       criteria: [],
+      releaseStatus:"All",
+      releaseStatusId:"2",
+      releaseSortCol:"Description",
+      releaseOrder:0,
+      releaseFilterName:"",
+      addreleaseStatus:1
     };
   }
 
@@ -1155,7 +1192,42 @@ export default class SystemFiles extends Component {
   getReleaseData() {
     this.refReactgrpTable.fireFetchData();
   }
-
+  setandGetdataStatus(releaseStatus,releaseStatusId){
+    this.setState({
+      releaseStatus:releaseStatus,
+      releaseStatusId:releaseStatusId
+    })
+    console.log("releaseStatus",releaseStatus);
+    console.log("releaseStatusId",releaseStatusId);
+    setTimeout(() => {
+      this.getReleaseData();
+    }, 500);
+    
+    
+  }
+  openreleaseFilter(){
+    if(this.state.isReleaseFilterOpen){
+      this.setState({
+        isReleaseFilterOpen:false,
+        //releaseFilterName:"",
+      })
+    }else{
+      this.setState({
+        isReleaseFilterOpen:true,
+        
+      })
+    }
+    
+  }
+  releaseFilerChange(name){
+    this.setState({
+      releaseFilterName:name,
+    })
+    console.log("name is ",name);
+    setTimeout(() => {
+      this.getReleaseData();
+    }, 500);
+  }
   getFormatedDate(Date) {
     return moment(Date).local().format("DD-MMM-YYYY HH:mm:ss ");
   }
@@ -1472,7 +1544,7 @@ export default class SystemFiles extends Component {
             ), // Custom cell components!
           };
         } else {
-          if (key.accessor == "status") {
+          if (key.accessor == "status" || key.accessor == "ReportStatus") {
             obj = {
               Header: (cellInfo) => (
                 <div>
@@ -1534,10 +1606,16 @@ export default class SystemFiles extends Component {
               //         <Search onChange={(e)=>this.customFilerChange(e.target.value,cellInfo.column.id,index,cellInfo.column.id)} value={this.state.filterVal[index]} hideFilter={()=>this.setState({visibleFilters:[]})}></Search>
               //     }
               //     </div>,
+              
               Cell: (rowInfo) => (
                 <span className="number">
-                  {rowInfo.original &&
-                    this.getStaustString(rowInfo.original.status)}
+                  
+                  {key.accessor=="ReportStatus" && rowInfo.original?
+                      this.getStaustString(rowInfo.original.ReportStatus)
+                      :
+                      rowInfo.original && this.getStaustString(rowInfo.original.status)
+                  }
+                  
                 </span>
               ), // Custom cell components!
             };
@@ -2292,6 +2370,7 @@ export default class SystemFiles extends Component {
       addFile: true,
       strDate: strDate,
       strEndDate: endDate,
+      addreleaseStatus:1
     });
   }
   openAddPhasePopUp(type, index) {
@@ -2349,13 +2428,15 @@ export default class SystemFiles extends Component {
             strEndDate: new Date(data.strEndDate),
             strHour: 0,
             strMin: 0,
-            status: data.status,
+            status: data.Status,
             systId: data.FileID,
+            addreleaseStatus:data.Status
           },
           () => {
             this.doubleClick = false;
           }
         );
+        console.log("check state",this.state.addreleaseStatus)
       } else if (type === "Edit Phase") {
         console.log("3 call setRelease in editphase");
         let data =
@@ -2398,6 +2479,7 @@ export default class SystemFiles extends Component {
     let url = "";
     let msg = "";
     let isvalied = "";
+    let rstatusChangeobj = {};
     if (this.state.addType === "Add Phase") {
       url = "Phase/AddPhase";
       msg = "Phase Added Successfully";
@@ -2461,7 +2543,7 @@ export default class SystemFiles extends Component {
           FileName: this.state.systName,
           ID: 0,
           Name: rNamw, //this.state.relName,
-          Status: 0,
+          Status: this.state.addreleaseStatus,
           strEndDate: this.state.strEndDate,
           strStartDate: dt,
           systemFileCriteriaVOs: null,
@@ -2476,15 +2558,26 @@ export default class SystemFiles extends Component {
       obj = {
         pSchedule_ReleaseVO: {
           ID: data.ID,
-          Status: 0,
+          Status: this.state.addreleaseStatus,
           strEndDate: this.state.strEndDate,
           strStartDate: this.state.strDate,
         },
       };
+      if (this.state.addType === "Edit Release"){
+        rstatusChangeobj = {
+          "pReleaseID" : data.ID,
+          "status" : this.state.addreleaseStatus,
+        };
+      }
     }
     if (isvalied == "") {
       postData(url, obj).then((res) => {
         if (res.data.ReturnCode === 0) {
+          if (this.state.addType === "Edit Release" && rstatusChangeobj){
+            postData("ScheduleRelease/ActivateRelease", rstatusChangeobj).then((res) => {
+
+            })
+          }
           this.setState(
             {
               addFile: false,
@@ -3845,6 +3938,11 @@ export default class SystemFiles extends Component {
       "Upgrade Successfull",
       "Yet to be scheduled",
     ];
+    const ReprotstatusType = [
+      "Scheduled",
+      "Upgrade Successfull",
+      "Yet to be scheduled",
+    ];
     const unitModecheck = ["Demo/Lab", "Production"];
     console.log("visibleCol", visibleCol);
     console.log("csvData", csvData);
@@ -3884,6 +3982,14 @@ export default class SystemFiles extends Component {
           var status = statusType[item.status];
           if (status) {
             item.status = status;
+          }
+          
+        }
+        if (item && item.ReportStatus >= 0) {
+          
+          var Reportstatus = ReprotstatusType[item.ReportStatus];
+          if (Reportstatus) {
+            item.ReportStatus = Reportstatus;
           }
         }
         if (item.UnitMode >= 0) {
@@ -4698,6 +4804,30 @@ export default class SystemFiles extends Component {
                         popperPlacement="right-start"
                       ></DatePicker>
                     </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginTop: "6px",
+                      }}
+                    >
+                      <span
+                        className="SystemFlUpldtxt"
+                        style={{ marginLeft: "14%" }}
+                      >
+                        Status *
+                      </span>
+                      <select
+                        className="SystDropDwn1"
+                        onChange={(e) =>
+                          this.setState({ addreleaseStatus: e.target.value })
+                        }
+                        value={this.state.addreleaseStatus}
+                      >
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                      </select>
+                    </div>
                   </div>
                 ) : (
                   <div>
@@ -5207,6 +5337,26 @@ export default class SystemFiles extends Component {
                       className="SchedTopCredSeprtr"
                     ></img>
                   </div>
+                  
+                  <select
+                         
+                          className="SystDropDwn1"
+                          style={{ width: "150px" }}
+                          defaultValue={this.state.releaseStatusId}
+                          onChange={(e) =>
+                            this.setandGetdataStatus(this.releaseActionOption[e.target.value].lable,this.releaseActionOption[e.target.value].value)
+                            // this.setState({
+                            //   releaseStatus: this.listOption[e.target.value].lable,
+                            //   releaseStatusId: this.listOption[e.target.value].value,
+                            // })
+                          }
+                        >
+                         
+                          {this.releaseActionOption.map((key, index) => (
+                            <option value={index}>{key.lable}</option>
+                          ))}
+                        </select>
+                  
                   <div className="releaseRefresh">
                     <img
                       src={
@@ -5218,6 +5368,119 @@ export default class SystemFiles extends Component {
                     ></img>
                   </div>
                 </div>
+                <div className="SchedGrpTableToolWrp">
+                  <div class="release_header">
+                  <div className="ScheduleHeaderWrp">
+                        <div>Name</div>
+                        <img
+                          src={require("../../../Assets/Images/Cab/sort.png")}
+                          className="ScheduleheadFilt1"
+                          onClick={() => {
+                            let order = 0
+                            if(this.state.releaseOrder==0){
+                                order=1;
+                            }
+                            this.setState({
+                              releaseSortCol:"Description",
+                              releaseOrder:order
+                            })
+                            setTimeout(() => {
+                                this.getReleaseData();
+                            }, 500);
+                          }}
+                        ></img>
+                        <img
+                            src={
+                              require("../../../Assets/Images/Filter/filter.png")
+                            }
+                            className="ScheduleheadFilt"
+                           onClick={() => this.openreleaseFilter()}
+                          ></img>
+                          
+                        
+                      </div>
+                  </div>
+                  <div class="release_header">
+                      <div className="ScheduleHeaderWrp">
+                        <div>Start Date</div>
+                        <img
+                          src={require("../../../Assets/Images/Cab/sort.png")}
+                          className="ScheduleheadFilt1"
+                          onClick={() => {
+                            let order = 0
+                            if(this.state.releaseOrder==0){
+                                order=1;
+                            }
+                            this.setState({
+                              releaseSortCol:"StartDate",
+                              releaseOrder:order
+                            })
+                            setTimeout(() => {
+                                this.getReleaseData();
+                            }, 500);
+                          }}
+                        ></img>
+                        
+                        
+                      </div>
+                  </div>
+                  <div class="release_header">
+                  <div className="ScheduleHeaderWrp">
+                        <div>End Date</div>
+                        <img
+                          src={require("../../../Assets/Images/Cab/sort.png")}
+                          className="ScheduleheadFilt1"
+                          onClick={() => {
+                            let order = 0
+                            if(this.state.releaseOrder==0){
+                                order=1;
+                            }
+                            this.setState({
+                              releaseSortCol:"EndDate",
+                              releaseOrder:order
+                            })
+
+                            setTimeout(() => {
+                                this.getReleaseData();
+                            }, 500);
+                          }}
+                        ></img>
+                        
+                        
+                      </div>
+                  </div>
+                </div>
+                {this.state.isReleaseFilterOpen ? (
+                  <div style={{position: "absolute", zIndex: "12", marginTop: "3px"}}>
+                  <div class="FiltreWrp">
+                    <input class="SchedFiltInptWrp"
+                     onChange={(e) =>
+                              this.releaseFilerChange(
+                                e.target.value,
+                              )
+                            }
+                    value={this.state.releaseFilterName}
+                    >
+                    </input>
+                    </div>
+                </div>
+                ):(
+                  <div></div>
+                )}
+                
+                {/* <div  style={{ position: "relative",zIndex:"99",top:"-10px" }}>
+                          <input
+                            className="SchedFiltInptWrp"
+                            // onChange={(e) =>
+                            //   this.customFilerChange(
+                            //     cellInfo.column.id,
+                            //     e.target.value,
+                            //     index
+                            //   )
+                            // }
+                            value=""
+                          ></input>
+                        </div> */}
                 <ReactTable
                   ref={(refReactgrpTable) => {
                     this.refReactgrpTable = refReactgrpTable;
@@ -5274,12 +5537,23 @@ export default class SystemFiles extends Component {
                     let start = instance.state.page * 20;
                     let end = (instance.state.page + 1) * 20;
                     this.setState({ loading: true });
-                    getData(
-                      "ScheduleRelease/FetchScheduleReleaseWithPagination/" +
-                        start +
-                        "/" +
-                        end
-                    ).then((res) => {
+                    // getData(
+                    //   "ScheduleRelease/FetchScheduleReleaseWithPagination/" +
+                    //     start +
+                    //     "/" +
+                    //     end
+                    // ).then((res) => {
+                      let dataobj={
+                        "RowStart" : start,
+                        "RowEnd" : end,
+                        "sort_col" : this.state.releaseSortCol,
+                        "order" : this.state.releaseOrder,
+                        "status":this.state.releaseStatusId,
+                        "searchName":this.state.releaseFilterName
+                      }
+                      postData(
+                        "ScheduleRelease/FetchScheduleReleaseWithPaginationAndSort",dataobj
+                      ).then((res) => {
                       if (res && res.data && res.data.ResponseCollection) {
                         this.setState({ loading: false });
                         this.setState(
