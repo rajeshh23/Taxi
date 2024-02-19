@@ -2818,21 +2818,25 @@ input{
     height:470px;
 
 }
+.br1{
+    border-top: 1px #000000;
+}
 .release_header{
     display: flex;
     padding-top: 6px;
     padding-bottom: 6px;
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-left: 6px;
+    padding-right: 6px;
     justify-content: center;
     align-items: center;
-    border: 1px solid #000000;
-    border-radius: 5px 5px 0px 0px;
+    /* border: 1px solid #000000;
+    border-radius: 5px 5px 0px 0px;*/
     font-family: var(--font);
     font-weight: bold;
     font-size: 10px;
     color: white;
     cursor: pointer;
+    width: 33.3%;
  .ScheduleheadFilt1{
     height: 10px;
  }

@@ -2578,19 +2578,22 @@ export default class SystemFiles extends Component {
 
             })
           }
-          this.setState(
-            {
-              addFile: false,
-              dlgtitle: "Information",
-              message: msg,
-              dlgType: "information",
-              dlgEnable: true,
-              loading: true,
-              systName: "",
-              relName: "",
-            },
-            () => this.getReleaseData()
-          );
+          setTimeout(()=>{
+            this.setState(
+              {
+                addFile: false,
+                dlgtitle: "Information",
+                message: msg,
+                dlgType: "information",
+                dlgEnable: true,
+                loading: true,
+                systName: "",
+                relName: "",
+              },
+              () => this.getReleaseData()
+            );
+          },500)
+         
         } else if (res.data.ReturnCode === 4) {
           this.setState(
             {
@@ -5368,7 +5371,7 @@ export default class SystemFiles extends Component {
                     ></img>
                   </div>
                 </div>
-                <div className="SchedGrpTableToolWrp">
+                <div className="SchedGrpTableToolWrp br1" >
                   <div class="release_header">
                   <div className="ScheduleHeaderWrp">
                         <div>Name</div>
